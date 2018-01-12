@@ -13,18 +13,6 @@ var BROWSERS = argv.browsers;
 
 module.exports = function (config) {
 
-  function getPostLoaders(){
-    var postLoaders = [];
-    if(RELEASE === true){
-      return  [ {
-        test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
-        loader: 'istanbul-instrumenter'
-      } ]
-    }
-    return postLoaders;
-  };
-
   function getReporters(){
     if(RELEASE === true){
       return  ['junit', 'progress', 'coverage']
@@ -41,7 +29,7 @@ module.exports = function (config) {
     if(RELEASE){
       browsers = ['Chrome','Firefox','IE']
     }else if(DEBUG){
-      browsers = ['Chrome'];
+      browsers = ['ChromeDebugging'];
     }
     return browsers;
   };
@@ -95,8 +83,7 @@ module.exports = function (config) {
     webpack: {
       devtool: 'inline-source-map',
       module: {
-        loaders: webpackConfig.module.loaders,
-        postLoaders : getPostLoaders()
+        loaders: webpackConfig.module.loaders
       },
       resolve: {
         extensions: ['', '.webpack.js', '.web.js', '.js', '.jsx']
@@ -107,7 +94,8 @@ module.exports = function (config) {
       externals: {
         'cheerio': 'window',
         'react/lib/ExecutionEnvironment': true,
-        'react/lib/ReactContext': true
+        'react/lib/ReactContext': true,
+        'react/addons': true
       }
     },
 
@@ -158,15 +146,15 @@ module.exports = function (config) {
     browsers: getBrowsers(),
 
     plugins: [
-    'karma-chrome-launcher',
-    'karma-firefox-launcher',
-    'karma-phantomjs-launcher-nonet',
-    'karma-ie-launcher',
-    'karma-jasmine',
-    'karma-jasmine-matchers',
-    'karma-webpack',
-    'karma-junit-reporter',
-    'karma-coverage'
+      'karma-chrome-launcher',
+      'karma-firefox-launcher',
+      'karma-phantomjs-launcher-nonet',
+      'karma-ie-launcher',
+      'karma-jasmine',
+      'karma-jasmine-matchers',
+      'karma-webpack',
+      'karma-junit-reporter',
+      'karma-coverage'
     ],
 
     customLaunchers: {
@@ -177,6 +165,11 @@ module.exports = function (config) {
       IE8: {
         base: 'IE',
         'x-ua-compatible': 'IE=EmulateIE8'
+      },
+      ChromeDebugging: {
+        base: 'Chrome',
+        flags: [ '--remote-debugging-port=9333' ],
+        debug: true
       }
     },
 
